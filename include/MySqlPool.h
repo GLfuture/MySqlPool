@@ -23,12 +23,12 @@ private:
 class MySqlPool//继承该类以返回this指针的share_ptr
 {
 public:
-    MySqlPool(){};
     MySqlPool(string pool_name, string host, string db_name, string user_name, string password, uint32_t port,uint32_t min_conn=DEFAULT_MIN_CONN,uint32_t max_conn=DEFAULT_MAX_CONN)
         : Pool_Name(pool_name), _remote(host), DB_Name(db_name), User_Name(user_name), Password(password),db_cur_conn_cnt(min_conn),db_max_conn_cnt(max_conn),
           _port(port), Is_terminate(false), wait_cnt(0)
     {
-        Init_Conn();
+        uint16_t ret = Init_Conn();
+        if(ret!=OK) throw ret;
     }
 
     //获取连接
