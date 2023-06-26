@@ -20,9 +20,25 @@ private:
 };
 
 
-class MySqlPool//继承该类以返回this指针的share_ptr
+class MySqlPool
 {
 public:
+    MySqlPool(MySqlPool&& pool)
+    {
+        this->conn_list=pool.conn_list;
+        this->db_cur_conn_cnt=pool.db_cur_conn_cnt;
+        this->db_max_conn_cnt=pool.db_max_conn_cnt;
+        this->DB_Name=pool.DB_Name;
+        this->Is_terminate=pool.Is_terminate;
+        this->Password=pool.Password;
+        this->Pool_Name=pool.Pool_Name;
+        this->User_Name=pool.User_Name;
+        this->wait_cnt=pool.wait_cnt;
+        this->_port=pool._port;
+        this->_remote=pool._remote;
+    }
+
+
     MySqlPool(string pool_name, string host, string db_name, string user_name, string password, uint32_t port,uint32_t min_conn=DEFAULT_MIN_CONN,uint32_t max_conn=DEFAULT_MAX_CONN)
         : Pool_Name(pool_name), _remote(host), DB_Name(db_name), User_Name(user_name), Password(password),db_cur_conn_cnt(min_conn),db_max_conn_cnt(max_conn),
           _port(port), Is_terminate(false), wait_cnt(0)
