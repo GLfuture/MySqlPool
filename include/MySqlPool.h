@@ -23,7 +23,9 @@ private:
 class MySqlPool
 {
 public:
-    MySqlPool(MySqlPool&& pool)
+    MySqlPool(){}
+
+    MySqlPool(const MySqlPool& pool)
     {
         this->conn_list=pool.conn_list;
         this->db_cur_conn_cnt=pool.db_cur_conn_cnt;
