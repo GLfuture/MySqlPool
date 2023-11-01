@@ -5,9 +5,6 @@
 #include"MySql.h"
 #include<condition_variable>
 #include<list>
-#define DEFAULT_MAX_CONN 8
-#define DEFAULT_MIN_CONN 4
-#define log_info(x) std::cout<<x<<std::endl
 class MySqlPool;
 
 class MySqlConn:public MySql{
@@ -41,12 +38,12 @@ public:
     }
 
 
-    MySqlPool(string pool_name, string host, string db_name, string user_name, string password, uint32_t port,uint32_t min_conn=DEFAULT_MIN_CONN,uint32_t max_conn=DEFAULT_MAX_CONN)
+    MySqlPool(string pool_name, string host, string db_name, string user_name, string password, uint32_t port,uint32_t min_conn,uint32_t max_conn)
         : Pool_Name(pool_name), _remote(host), DB_Name(db_name), User_Name(user_name), Password(password),db_cur_conn_cnt(min_conn),db_max_conn_cnt(max_conn),
           _port(port), Is_terminate(false), wait_cnt(0)
     {
         uint16_t ret = Init_Conn();
-        if(ret!=OK) throw ret;
+        if(ret!=0) throw ret;
     }
 
     //获取连接

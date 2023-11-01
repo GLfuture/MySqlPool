@@ -1,5 +1,7 @@
 #include"include/MySqlPool.h"
 #include"include/ThreadPool.h"
+#include <unistd.h>
+#include <sys/time.h>
 static uint64_t get_tick_count()
 {
     struct timeval tval;
@@ -13,7 +15,7 @@ static uint64_t get_tick_count()
 int query_task(MySqlPool &sql_pool,string name)
 {
     MySqlConn* conn = sql_pool.Get_Conn(0);
-    int ret = conn->Insert(conn->Insert_Query("manager",MySqlConn::Arg_List("name","age"),MySqlConn::Arg_List(name,"20")));
+    int ret = conn->Insert(conn->Insert_Query("user",MySqlConn::Arg_List("username","password"),MySqlConn::Arg_List(name,"20")));
     sql_pool.Ret_Conn(conn);//用完连接需要归还
     return ret;
 }
@@ -21,7 +23,7 @@ int query_task(MySqlPool &sql_pool,string name)
 int main()
 {
     
-    MySqlPool sql_pool("pool1","127.0.0.1","test","user1","123456",3306);
+    MySqlPool sql_pool("pool1","8.130.92.28","web","gong","123456",3306,4,8);
     ThreadPool th_pool(4);
     std::queue<std::future<int>> q;
     for(int i=0;i<100;i++){

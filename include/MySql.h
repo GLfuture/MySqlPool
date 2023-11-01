@@ -5,32 +5,22 @@
 #include<mysql/mysql.h>
 #include<string>
 #include<vector>
-#include<span>
 #include<typeinfo>
 #include<cxxabi.h>
-#include<exception>
+#include <memory>
+#include<spdlog/spdlog.h>
 #include<string.h>
 
-#define log_err(x) std::cout<<x<<std::endl
-#define OK 0
-#define EMPTY 1
-#define ERROR 2
 using std::string;
 using std::vector;
-using std::span;
 using namespace abi;
 
 #endif
-class Type_Exception:public std::exception{
-public:
-    const char* what() {
-        return "type error";
-    }
-};
 
 class MySql//:public std::exception
 {
 public:
+    using Ptr = std::shared_ptr<MySql>;
     enum Alter_Type{
         ADD,
         DROP,
@@ -57,27 +47,27 @@ public:
     string Alter_Query(string tb_name,Alter_Type type,string condition);
 
     
-    uint32_t Connect(string remote,string usrname,string passwd,string db_name,int32_t port);
+    int Connect(string remote,string usrname,string passwd,string db_name,int32_t port);
 
-    uint32_t Create_Table(string query);
+    int Create_Table(string query);
 
-    uint32_t Drop_Table(string query);
+    int Drop_Table(string query);
 
-    //inline uint32_t Create_DB(string db_name);
+    //inline int Create_DB(string db_name);
 
-    vector<vector<string>> Select(string query);
+    int Select(string query,vector<vector<string>> &results);
 
-    uint32_t Insert(string query);
+    int Insert(string query);
 
-    uint32_t Update(string query);
+    int Update(string query);
 
-    uint32_t Delete(string query);
+    int Delete(string query);
 
-    uint32_t Alter(string query);
+    int Alter(string query);
     //发送二进制数据
-    uint32_t Param_Send_Binary(string param_query,const char* buffer,int32_t len);
+    int Param_Send_Binary(string param_query,const char* buffer,int32_t len);
     //接收二进制数据
-    uint32_t Param_Recv_Binary(string param_query,char *&buffer,int32_t len);
+    int Param_Recv_Binary(string param_query,char *&buffer,int32_t len);
     // 开启事务
 	bool StartTransaction();
 	// 提交事务
@@ -91,15 +81,9 @@ public:
     template<typename ...Str>
     static inline vector<string> Arg_List(Str...colmuns){
         vector<string> ans;
-        try{
-            vector<string> res;
-            arg_all(res,colmuns...);
-            ans=res;
-        }
-        catch(Type_Exception* &e){
-            log_err(e->what());
-            delete e;
-        }
+        vector<string> res;
+        arg_all(res, colmuns...);
+        ans = res;
         return ans;
     }
 
@@ -118,7 +102,7 @@ private:
 
     template<typename Arg,typename ... Args>
     static inline void arg_sub(vector<string>& sub,Arg value,Args...values){
-        if(!IsString(value)) throw new Type_Exception;
+        if(!IsString(value)) return;
         sub.push_back(value);
         arg_sub(sub,values...);
     }
@@ -135,11 +119,11 @@ private:
         if(type.find("char")!=string::npos||type.find("string")!=string::npos) return true;
         return false;
     }
-    inline span<string> Cmd_History(){
+    inline vector<string> Cmd_History(){
         return cmd_history;
     }
 
-    inline uint32_t  Cmd_Num(){
+    inline int  Cmd_Num(){
         return cmd_history.size();
     }
 

@@ -7,4 +7,5 @@ include_directories(include)
 add_subdirectory(src)
 link_directories(lib)
 add_executable(main main.cc)
-target_link_libraries(main MySql mysqlclient MySqlPool)
+target_link_libraries(main MySql mysqlclient MySqlPool pthread)
+
